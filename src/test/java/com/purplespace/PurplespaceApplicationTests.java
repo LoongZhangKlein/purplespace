@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PurplespaceApplicationTests {
+class PurpleSpaceApplicationTests {
 
     @Test
     void contextLoads() {
