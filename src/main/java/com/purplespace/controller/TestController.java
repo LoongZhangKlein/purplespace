@@ -22,9 +22,9 @@ public class TestController {
     public String test(){
         System.out.println("ssssssssssss");
         System.out.println("ssssssssssss");
-        redis.setKey("1","紫东");
-        String key = (String) redis.getKey("1");
-        System.out.println(key);
+//        redis.setKey("1","紫东");
+//        String key = (String) redis.getKey("1");
+        System.out.println("key");
 
         return "设置成功";
     }

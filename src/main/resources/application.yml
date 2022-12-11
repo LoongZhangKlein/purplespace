@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /purple
 spring:
+  #Reids配置
   redis:
     host: localhost
     port: 6379
@@ -13,5 +14,10 @@ spring:
         max-idle: 8
         min-idle: 1
     timeout: PT10S
-
+# NameServer地址
+rocketmq:
+  name-server: 127.0.0.1:9876
+  # 默认的消息组
+  producer:
+    group: springBootGroup
 
