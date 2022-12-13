@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -19,12 +20,13 @@ import java.util.concurrent.*;
  */
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService, Runnable {
+public class UserServiceImpl implements UserService{
     @Resource
     UserMapper userMapper;
     @Resource
     ThreadPoolUtils threadPoolUtils;
-    private List<User> userList = new ArrayList<>();
+    private static List<User> userList = new ArrayList<>();
+    private static List<User> userListMain = new ArrayList<>();
 
 
     public int addUser(User user) {
@@ -32,16 +34,29 @@ public class UserServiceImpl implements UserService, Runnable {
             throw new RuntimeException("添加数据为空");
         }
         int insert = userMapper.insert(user);
+
         return insert;
     }
     @Override
     public int add() {
+        userList.clear();
+        userListMain.clear();
+        log.info("当前userListMain容量"+userListMain.size());
+        addUserSingle();
+        log.info("单线程执行完成后userListMain容量"+userListMain.size());
+        addThreadMethod();
 
         return 1;
     }
-    public int createUserCustomer() throws ExecutionException, InterruptedException {
-        addThreadMethod();
-        return 1;
+    public int addUserSingle() {
+        log.info("单线程执行开始");
+        long l = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            User virtualUser = this.createVirtualUser();
+            userListMain.add(virtualUser);
+        }
+        log.info("单线程执行结束 执行消耗时间{}",System.currentTimeMillis()-l);
+        return 8849;
     }
 
     /**
@@ -51,15 +66,21 @@ public class UserServiceImpl implements UserService, Runnable {
      */
     private int addThreadMethod() {
         ThreadPoolExecutor threadPoolExecutor = threadPoolUtils.threadPoolExecutor();
-        for (int i = 0; i < 10; i++) {
-            // 创建runnable接口
-            CustomRunnable<User> customRunnable = new CustomRunnable<>(this.createVirtualUser());
-            threadPoolExecutor.submit(customRunnable);
-
-            // 执行线
+        long l = System.currentTimeMillis();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        log.info("多线程执行开始 当前时间{}",Thread.currentThread().getName(),df.format(new Date()));
+        for (int i = 0; i < 10000; i++) {
+            threadPoolExecutor.execute(()->{
+                User virtualUser = this.createVirtualUser();
+                userList.add(virtualUser);
+            });
         }
-        // 关闭线程
-        //threadPoolExecutor.shutdown();
+        while (threadPoolExecutor.getActiveCount()<=0){
+            threadPoolExecutor.shutdown();
+            log.info("当前userList容量{} 执行消耗时间{}",userList.size(),System.currentTimeMillis()-l);
+            return 0;
+        }
+        //
         return 1;
     }
 
@@ -79,12 +100,15 @@ public class UserServiceImpl implements UserService, Runnable {
         return user;
     }
 
-    @Override
-    public void run() {
-        // 创建用户
-        for (int i = 0; i < 100; i++) {
-            User virtualUser = this.createVirtualUser();
-            userList.add(virtualUser);
-        }
+//    @Override
+//    public void run() {
+//        // 创建用户
+//            User virtualUser = this.createVirtualUser();
+//            userList.add(virtualUser);
+//
+//    }
+
+    public int getListSize(){
+        return userList.size();
     }
 }

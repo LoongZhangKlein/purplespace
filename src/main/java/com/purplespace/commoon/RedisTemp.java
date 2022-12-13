@@ -1,10 +1,11 @@
 package com.purplespace.commoon;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.types.Expiration;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2022-12-12-15:57
  */
 @Component
-public class RedisService {
+public class RedisTemp {
 
     @Resource
     public RedisTemplate redisTemplate;
@@ -155,7 +156,7 @@ public class RedisService {
      * @param key 缓存的键值
      * @return 缓存键值对应的数据
      */
-    public <T> List<T> getCacheListRange(final String key,int start,int end) {
+    public <T> List<T> getCacheListRange(final String key, int start, int end) {
         return redisTemplate.opsForList().range(key, start, end);
     }
 
@@ -312,5 +313,49 @@ public class RedisService {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 使用pipelined批量存储
+     * @param map
+     * @param seconds
+     */
+    public void executeMapPipelined(Map<String, String> map, long seconds) {
+        RedisSerializer stringSerializer = redisTemplate.getStringSerializer();
+        redisTemplate.executePipelined(new RedisCallback<Object>() {
+            @Override
+            public String doInRedis(RedisConnection connection) throws DataAccessException {
+                map.forEach((key, value) -> {
+                    connection.set(stringSerializer.serialize(key), stringSerializer.serialize(value)
+                            , Expiration.seconds(seconds), RedisStringCommands.SetOption.UPSERT);
+
+                });
+                return null;
+            }
+        },stringSerializer);
+    }
+
+    public void executeStringPipelined(Object key,Object value,long seconds) {
+        RedisSerializer stringSerializer = redisTemplate.getStringSerializer();
+        RedisSerializer keySerializer = redisTemplate.getKeySerializer();
+        RedisSerializer valueSerializer = redisTemplate.getValueSerializer();
+        redisTemplate.executePipelined(new RedisCallback<Object>() {
+            @Override
+            public String doInRedis(RedisConnection connection) throws DataAccessException {
+                connection.set(keySerializer.serialize(key),valueSerializer.serialize(value),Expiration.seconds(seconds),RedisStringCommands.SetOption.UPSERT);
+                /**
+                 * 源码提示
+                 * Callback cannot return a non-null value as it gets overwritten by the pipeline
+                 * （回调无法返回非null值，因为它会被管道覆盖）
+                 */
+                return null;
+            }
+        },stringSerializer);
+    }
+    public void setObjectKey(Object key,Object value,long seconds){
+        redisTemplate.opsForValue().set(key,value,seconds);
+    }
+    public Object getObjectKey(Object key){
+        return redisTemplate.opsForValue().get(key);
     }
 }

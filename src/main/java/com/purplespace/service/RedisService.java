@@ -7,4 +7,5 @@ package com.purplespace.service;
  */
 public interface RedisService {
     void operationTest();
+    void set();
 }

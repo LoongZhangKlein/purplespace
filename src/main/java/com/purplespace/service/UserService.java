@@ -12,5 +12,4 @@ import java.util.concurrent.ExecutionException;
 public interface UserService {
 
     int add();
-    int createUserCustomer() throws ExecutionException, InterruptedException;
 }
