@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.purplespace.commoon.RedisTemp;
 import com.purplespace.entity.User;
 import com.purplespace.mapper.UserMapper;
+import com.purplespace.service.Impl.UserServiceImpl;
 import com.purplespace.service.UserService;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,8 @@ public class UserController {
     @Resource
     private UserService userService;
     @Resource
+    private UserServiceImpl userServiceImpl;
+    @Resource
     private RedisTemp redisTemp;
     @RequestMapping("/user")
     public String test(){
@@ -42,12 +45,15 @@ public class UserController {
         return "";
     }
     @RequestMapping("/add")
-    public int add() throws ExecutionException, InterruptedException {
+    public int add(){
         int userCustomer = userService.add();
         System.out.println(userCustomer);
         return 1;
-
-
     }
-
+    @RequestMapping("/clear")
+    public int clear()  {
+        UserServiceImpl.userList.clear();
+        System.out.println("清除成功");
+        return 1;
+    }
 }

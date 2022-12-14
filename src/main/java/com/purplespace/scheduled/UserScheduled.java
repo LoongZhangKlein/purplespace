@@ -30,8 +30,7 @@ public class UserScheduled {
     //每5秒执行一次
     //@Scheduled(cron = "0/2 * * * * ? ")
     public void execute() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        log.info("当前线程池存活线程数量{},当前系统时间:{}", threadPoolUtils.activeThreadNumb(),df.format(new Date()));
-        log.info("用户数据数量{},当前系统时间:{}", userServiceImpl.getListSize(),df.format(new Date()));
+//        log.info("当前线程池存活线程数量{},当前系统时间:{}", threadPoolUtils.activeThreadNumb(),df.format(new Date()));
+        log.info("用户数据数量{}", userServiceImpl.getListSize());
     }
 }

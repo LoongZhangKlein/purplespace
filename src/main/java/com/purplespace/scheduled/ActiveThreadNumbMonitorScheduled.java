@@ -20,8 +20,8 @@ public class ActiveThreadNumbMonitorScheduled {
     ThreadPoolUtils threadPoolUtils;
 
     //每5秒执行一次
-    @Scheduled(cron = "0/2 * * * * ? ")
-    public void execute() {
-        log.info("当前线程池存活线程数量{},当前系统时间:{}", threadPoolUtils.activeThreadNumb(),new Date());
-    }
+    //@Scheduled(cron = "0/2 * * * * ? ")
+//    public void execute() {
+//        log.info("当前线程池存活线程数量{},当前系统时间:{}", threadPoolUtils.activeThreadNumb(),new Date());
+//    }
 }

@@ -10,17 +10,6 @@ import java.util.concurrent.*;
  * @Description DOING
  * @date 2022-12-12-17:07
  */
-class ThreadTask implements Runnable {
-    public ThreadTask() {
-
-    }
-
-    @Override
-    public void run() {
-
-    }
-}
-
 @Component
 public class ThreadPoolUtils<T> {
     private static final Runnable T =null;
@@ -33,48 +22,26 @@ public class ThreadPoolUtils<T> {
     private static final int queueCapacity = 100;
     // 多余线程存活时间
     private static final Long keepAliveTime = 1L;
-    private ThreadPoolExecutor threadPoolExecutor = null;
+    private static ThreadPoolExecutor  threadPoolExecutor;
 
-    public ThreadPoolExecutor threadPoolExecutor() {
-        if (threadPoolExecutor != null) {
-            return this.threadPoolExecutor;
-        }
-        threadPoolExecutor = new ThreadPoolExecutor(
-                corePoolSize,
-                maxPoolSize,
-                keepAliveTime,
-                TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(queueCapacity),
-                new ThreadPoolExecutor.CallerRunsPolicy());
-        return threadPoolExecutor;
-    }
-    public void startCustomThread(int threadNumb,T t){
-        this.t=t;
-        for (int i = 0; i < threadNumb; i++) {
-                // 创建runnable接口
-                threadPoolExecutor.submit(T);
-                // 执行线
+    private ThreadPoolUtils(){
 
-        }
     }
-    public int activeThreadNumb(){
+    public static ThreadPoolExecutor getThreadPoolExecutor(){
         if (threadPoolExecutor==null){
-            return -1;
-        }
-        return threadPoolExecutor.getActiveCount();
-    }
+            synchronized (ThreadPoolUtils.class){
+                if (threadPoolExecutor==null){
+                    threadPoolExecutor= new ThreadPoolExecutor(
+                            corePoolSize,
+                            maxPoolSize,
+                            keepAliveTime,
+                            TimeUnit.SECONDS,
+                            new ArrayBlockingQueue<>(queueCapacity),
+                            new ThreadPoolExecutor.CallerRunsPolicy());
+                }
+            }
 
-    public ThreadPoolExecutor threadPoolExecutor(int corePoolSize, int maxPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
-        if (threadPoolExecutor != null) {
-            return this.threadPoolExecutor;
         }
-        threadPoolExecutor = new ThreadPoolExecutor(
-                corePoolSize,
-                maxPoolSize,
-                keepAliveTime,
-                unit,
-                new ArrayBlockingQueue<>(queueCapacity),
-                new ThreadPoolExecutor.CallerRunsPolicy());
         return threadPoolExecutor;
     }
 }

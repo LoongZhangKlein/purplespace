@@ -57,6 +57,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-client-java -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client-java</artifactId>
+            <version>5.0.3</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.rocketmq</groupId>

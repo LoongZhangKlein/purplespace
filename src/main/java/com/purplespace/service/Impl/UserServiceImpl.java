@@ -5,6 +5,7 @@ import com.purplespace.mapper.UserMapper;
 import com.purplespace.service.UserService;
 import com.purplespace.utils.CustomRunnable;
 import com.purplespace.utils.ThreadPoolUtils;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +21,13 @@ import java.util.concurrent.*;
  */
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     @Resource
     UserMapper userMapper;
     @Resource
     ThreadPoolUtils threadPoolUtils;
-    private static List<User> userList = new ArrayList<>();
-    private static List<User> userListMain = new ArrayList<>();
+    public static List<User> userList = new ArrayList<>();
+    public static List<User> userListMain = new ArrayList<>();
 
 
     public int addUser(User user) {
@@ -37,25 +38,25 @@ public class UserServiceImpl implements UserService{
 
         return insert;
     }
+
     @Override
     public int add() {
         userList.clear();
         userListMain.clear();
-        log.info("当前userListMain容量"+userListMain.size());
-        addUserSingle();
-        log.info("单线程执行完成后userListMain容量"+userListMain.size());
         addThreadMethod();
-
+        //addUserSingle();
         return 1;
     }
+
     public int addUserSingle() {
         log.info("单线程执行开始");
         long l = System.currentTimeMillis();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 500000; i++) {
             User virtualUser = this.createVirtualUser();
             userListMain.add(virtualUser);
         }
-        log.info("单线程执行结束 执行消耗时间{}",System.currentTimeMillis()-l);
+        log.info("单线程执行结束 执行消耗时间{}", System.currentTimeMillis() - l);
+        log.info("userListMain{}", userListMain.size());
         return 8849;
     }
 
@@ -65,22 +66,37 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     private int addThreadMethod() {
-        ThreadPoolExecutor threadPoolExecutor = threadPoolUtils.threadPoolExecutor();
-        long l = System.currentTimeMillis();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        log.info("多线程执行开始 当前时间{}",Thread.currentThread().getName(),df.format(new Date()));
-        for (int i = 0; i < 10000; i++) {
-            threadPoolExecutor.execute(()->{
-                User virtualUser = this.createVirtualUser();
-                userList.add(virtualUser);
+        CountDownLatch countDownLatch = new CountDownLatch(5);
+        ThreadPoolExecutor threadPoolExecutor = ThreadPoolUtils.getThreadPoolExecutor();
+        log.info("多线程用户添加开始");
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 5; i++) {
+            int name = i;
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (Runnable.class) {
+                        for (int j = 0; j < 100000; j++) {
+                            //log.info("当前执行线程++>{}",Thread.currentThread().getName());
+                            userList.add(createVirtualUser());
+                            //log.info("用户信息",createVirtualUser());
+                        }
+                    }
+                    //该线程执行完毕-1
+                    countDownLatch.countDown();
+                }
             });
         }
-        while (threadPoolExecutor.getActiveCount()<=0){
-            threadPoolExecutor.shutdown();
-            log.info("当前userList容量{} 执行消耗时间{}",userList.size(),System.currentTimeMillis()-l);
-            return 0;
+        //关闭线程处理
+        try {
+            countDownLatch.await();
+            log.info("五个线程添加50000用户所需要时间{}", System.currentTimeMillis() - start);
+            log.info("userList容量{}", userList.size());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        //
+        //关闭线程池
+        //threadPoolExecutor.shutdown();
         return 1;
     }
 
@@ -108,7 +124,8 @@ public class UserServiceImpl implements UserService{
 //
 //    }
 
-    public int getListSize(){
+    public int getListSize() {
         return userList.size();
     }
+
 }
