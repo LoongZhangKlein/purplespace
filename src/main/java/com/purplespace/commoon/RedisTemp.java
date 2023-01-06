@@ -1,5 +1,6 @@
 package com.purplespace.commoon;
 
+//import org.checkerframework.checker.units.qual.K;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
@@ -358,4 +359,31 @@ public class RedisTemp {
     public Object getObjectKey(Object key){
         return redisTemplate.opsForValue().get(key);
     }
+    // 以下是自定义
+
+    /**
+     * 从左边添加元素
+     * @param key
+     */
+    public Object leftPop(String key,String value){
+        return redisTemplate.opsForList().leftPush(key,value);
+    }
+    public Object rightPush(String key,String value){
+        return redisTemplate.opsForList().rightPush(key,value);
+    }
+    public Object rightPop(String key){
+        return redisTemplate.opsForList().rightPop(key);
+    }
+
+    public Long lSize(String key){
+        return redisTemplate.opsForList().size(key);
+
+    }
+    public <T>List<T> lRange(Object key, Long start, Long end){
+        return redisTemplate.opsForList().range(key, start, end);
+    }
+    public void bfadd(){
+
+    }
+
 }

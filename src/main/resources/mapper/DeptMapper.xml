@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.purplespace.mapper.DeptMapper">
+    <insert id="addBranch" parameterType="java.util.List">
+        insert into dept(id,dName,db_source)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.id},#{item.dName},#{item.dbSource})
+        </foreach>
+    </insert>
+    <insert id="addOne" parameterType="com.purplespace.entity.Dept">
+        insert into dept(id, dName, db_source)
+        values (#{id}, #{dName}, #{dbSource})
+    </insert>
+    <update id="updateBranch" parameterType="java.util.List">
+        update dept
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="dname=case" suffix="end,">
+                <foreach collection="list" item="item">
+                    when id=#{item.id} then #{item.dName}
+                </foreach>
+            </trim>
+            <trim prefix="db_source=case" suffix="end,">
+                <foreach collection="list" item="item">
+                    when id=#{item.id} then #{item.dbSource}
+                </foreach>
+            </trim>
+        </trim>
+        <where>
+            <foreach collection="list" item="item" index="index" separator="or">
+                id=#{item.id}
+            </foreach>
+        </where>
+
+    </update>
+    <delete id="delBranch" parameterType="java.util.List">
+        delete from dept
+        where
+        id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

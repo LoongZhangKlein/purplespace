@@ -17,8 +17,8 @@ spring:
   datasource:
     username: root
     password: root
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true
     type: com.alibaba.druid.pool.DruidDataSource
     #   数据源其他配置
     initialSize: 5
@@ -43,4 +43,9 @@ rocketmq:
   # 默认的消息组
   producer:
     group: springBootGroup
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  #配置输出日志文件
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 

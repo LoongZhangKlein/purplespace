@@ -12,13 +12,14 @@ import javax.annotation.Resource;
  * @date 2022-12-13-14:31
  */
 @RestController
-@RequestMapping("/redis")
+@RequestMapping("")
 public class RedisController {
     @Resource
     RedisService redisService;
 
-    @RequestMapping("/testSet")
-    public void setTest() {
-        redisService.set();
-    }
+
+//    @RequestMapping("/testSet")
+//    public void setTest() {
+//        redisService.set();
+//    }
 }
