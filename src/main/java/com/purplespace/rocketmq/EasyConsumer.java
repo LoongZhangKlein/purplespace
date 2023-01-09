@@ -149,12 +149,13 @@ public class EasyConsumer {
     }
     @RequestMapping("/transactionConsumer")
     public void transactionConsumer() throws MQClientException {
-        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("transactionConsumer");
-        consumer.setNamesrvAddr(longPort);
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("transactionConsumerII");
+        //consumer.setNamesrvAddr(longPort);
+        consumer.setNamesrvAddr("192.168.1.888:9876");
         // todo wsm
         consumer.setConsumeMessageBatchMaxSize(10);
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        consumer.subscribe("topictransaction", "*");
+        consumer.subscribe("please_rename_unique_group_name", "*");
         consumer.registerMessageListener(new MessageListenerConcurrently() {
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> list, ConsumeConcurrentlyContext consumeConcurrentlyContext) {
@@ -168,6 +169,6 @@ public class EasyConsumer {
             }
         });
         consumer.start();
-        System.out.println("生产成功 O(∩_∩)O");
+        System.out.println("消费成功 O(∩_∩)O");
     }
 }

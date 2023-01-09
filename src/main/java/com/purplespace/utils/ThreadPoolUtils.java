@@ -18,7 +18,7 @@ public class ThreadPoolUtils<T> {
     private static final int corePoolSize = 5;
     // 线程池最大线程数
     private static final int maxPoolSize = 10;
-    //
+    // 等待队列最大长度
     private static final int queueCapacity = 100;
     // 多余线程存活时间
     private static final Long keepAliveTime = 1L;

@@ -13,4 +13,5 @@ import org.mapstruct.Mapper;
 public interface UserMapper extends BaseMapper<User> {
 
 
+    int reduceMoney(Long fromUserId, Long changeMoney);
 }

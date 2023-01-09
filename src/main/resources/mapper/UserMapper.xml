@@ -9,4 +9,7 @@
     </foreach>
     commit
     </insert>
+    <update id="reduceMoney">
+        update user set money = money - #{money} where id = #{userId} and money >= #{money}
+    </update>
 </mapper>

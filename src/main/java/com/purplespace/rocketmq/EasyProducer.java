@@ -1,6 +1,12 @@
 package com.purplespace.rocketmq;
 
+import com.mysql.cj.MessageBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.apis.ClientException;
+import org.apache.rocketmq.client.apis.ClientServiceProvider;
+import org.apache.rocketmq.client.apis.consumer.PushConsumerBuilder;
+import org.apache.rocketmq.client.apis.consumer.SimpleConsumerBuilder;
+import org.apache.rocketmq.client.apis.producer.ProducerBuilder;
 import org.apache.rocketmq.client.apis.producer.TransactionChecker;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -17,6 +23,7 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +37,8 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/rmProducer")
 public class EasyProducer {
+    @Resource
+    TransactionProducer transactionProducer;
     String ipAndPort = "192.168.1.1:8849";
     String longAddress = "192.168.100.145:9876;192.168.100.146:9876;192.168.100.149:9876;192.168.100.239:9876";
 
@@ -230,17 +239,15 @@ public class EasyProducer {
         producer.shutdown();
         return "顺序生产成功";
     }
+
+
     /**
-     * 发送事务消息
-     *  todo 这个方法被废除了????????
+     * 根据rm官网DEMO模拟发送事务
+     *
      */
     @RequestMapping("/transactionProducer")
-    public void transactionProducer(){
-         new TransactionCheckListener() {
-             @Override
-             public LocalTransactionState checkLocalTransactionState(MessageExt messageExt) {
-                 return null;
-             }
-         };
+    public void transactionProducer() throws ClientException {
+        transactionProducer.test();
+
     }
 }
